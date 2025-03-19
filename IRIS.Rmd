@@ -1,0 +1,85 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+1.  **Install and Load Required Libraries**: First, install and load the
+    necessary libraries.
+
+```{r}
+# Install the required packages
+install.packages("datasets")
+install.packages("caret")
+install.packages("ggplot2")
+	
+# Load the libraries
+library(datasets)
+library(caret)
+library(ggplot2)
+```
+
+```{r}
+getwd()
+```
+
+2.  **Load the MyIris Dataset**: Load the MyIris dataset which is
+    available in the `datasets` package.
+
+```{r}
+# Load the MyIris dataset
+setwd("C:/Users/hp/Documents/CODSOFT")
+MyIris<-read.csv("IRIS.csv")
+MyIris
+View(MyMyIris)
+```
+
+3.  **Exploratory Data Analysis (EDA)**: Perform some exploratory data
+    analysis to understand the dataset better.
+
+```{r}
+# Summary of the dataset
+summary(MyIris)
+
+# Plot the data
+ggplot(MyIris, aes(x = sepal_length, y = sepal_width, color = species)) +
+  geom_point() +
+  labs(title = "sepal_length vs sepal_width")
+
+ggplot(MyIris, aes(x = petal_length, y = petal_width, color = species)) +
+  geom_point() +
+  labs(title = "petal_length vs petal_width")
+```
+
+4.  **Split the Data into Training and Testing Sets**: Split the dataset
+    into training and testing sets.
+
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Split the data
+trainIndex <- createDataPartition(MyIris$species, p = 0.7, list = FALSE)
+trainData <- MyIris[trainIndex,]
+testData <- MyIris[-trainIndex,]
+```
+
+5.  **Train a Model**: Train a machine learning model. We'll use the
+    k-Nearest Neighbors (k-NN) algorithm for this example.
+
+```{r}
+# Train the model using k-NN
+model <- train(species ~ ., data = trainData, method = "knn", tuneLength = 10)
+print(model)
+```
+
+6.  **Evaluate the Model**: Evaluate the performance of the model using
+    the testing set.
+
+```{r}
+# Make predictions on the test set
+predictions <- predict(model, newdata = testData)
+
+# Confusion matrix
+confusionMatrix(predictions, testData$species)
+```
