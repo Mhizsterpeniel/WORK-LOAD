@@ -1,0 +1,127 @@
+
+```{r}
+install.packages("tidyverse")
+install.packages("caret")
+install.packages("randomForest")
+```
+```{r}
+getwd()
+```
+```{r}
+setwd("C:/Users/hp/Documents/CODSOFT")
+```
+
+```{r}
+library(tidyverse)
+Titanic <- read.csv("Titanic-Dataset.csv")
+```
+
+##LOAD THE DATA
+
+```{r}
+summary(Titanic)
+```
+```{r}
+Titanic$Age[is.na(Titanic$Age)] <- median(Titanic$Age, na.rm = TRUE)
+
+```
+
+```{r}
+Titanic$Embarked[is.na(Titanic$Embarked)] <- 'S'
+```
+
+```{r}
+Titanic$Pclass <- as.factor(Titanic$Pclass)
+Titanic$Sex <- as.factor(Titanic$Sex)
+Titanic$Embarked <- as.factor(Titanic$Embarked)
+```
+
+```{r}
+Titanic$FamilySize <- Titanic$SibSp + Titanic$Parch + 1
+```
+
+```{r}
+install.packages("caret")
+library(caret)
+```
+```{r}
+library(randomForest)
+model <- randomForest(Survived ~ Pclass + Sex + Age + FamilySize + Fare + Embarked, data = TitanicData, ntree = 100)
+```
+
+```{r}
+library(tidyverse)
+library(caret)
+library(randomForest)
+
+# Load the data
+Titanic <- read.csv("Titanic-Dataset.csv")
+
+# Data Cleaning
+Titanic$Age[is.na(Titanic$Age)] <- median(Titanic$Age, na.rm = TRUE)
+Titanic$Embarked[is.na(Titanic$Embarked)] <- 'S'
+Titanic$Pclass <- as.factor(Titanic$Pclass)
+Titanic$Sex <- as.factor(Titanic$Sex)
+Titanic$Embarked <- as.factor(Titanic$Embarked)
+Titanic$Survived <- as.factor(Titanic$Survived)  # Ensure 'Survived' is a factor
+
+# Feature Engineering
+Titanic$FamilySize <- Titanic$SibSp + Titanic$Parch + 1
+
+# Splitting the Data
+set.seed(123)
+TitanicIndex <- createDataPartition(Titanic$Survived, p = 0.8, list = FALSE)
+TitanicData <- Titanic[TitanicIndex, ]
+testData <- Titanic[-TitanicIndex, ]
+
+# Build the Model (Classification)
+model <- randomForest(Survived ~ Pclass + Sex + Age + FamilySize + Fare + Embarked, data = TitanicData, ntree = 100)
+
+# Make Predictions
+predictions <- predict(model, testData)
+
+# Evaluate the Model
+confusionMatrix(predictions, testData$Survived)
+
+```
+```{r}
+predictions <- predict(model, testData)
+
+```
+
+```{r}
+confusionMatrix(predictions, testData$Survived)
+
+```
+```{r}
+library(caret)
+confusion <- confusionMatrix(predictions, testData$Survived)
+print(confusion)
+```
+
+
+```{r}
+results <- data.frame(Actual = testData$Survived, Predicted = predictions)
+head(results)
+
+```
+```{r}
+library(ggplot2)
+# Bar chart of actual vs predicted values
+ggplot(results, aes(x = Actual, fill = Predicted)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Actual vs Predicted Survival", x = "Actual Survival", y = "Count") +
+  theme_minimal()
+
+```
+```{r}
+importance <- importance(model)
+var_importance <- data.frame(Variables = row.names(importance), Importance = importance[, 1])
+ggplot(var_importance, aes(x = reorder(Variables, Importance), y = Importance)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Feature Importance", x = "Features", y = "Importance") +
+  theme_minimal()
+
+```
+
